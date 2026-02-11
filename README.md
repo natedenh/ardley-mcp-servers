@@ -16,49 +16,55 @@ Each module is a standalone MCP server that communicates via JSON-RPC 2.0 over s
 ## Prerequisites
 
 - **Java 17+**
-- **Maven 3.8+**
+- **Gradle 8.5+** (wrapper included)
 
 ## Build
 
 ```bash
 # Build everything
-mvn clean package
+./gradlew build
 
 # Build a specific module
-mvn clean package -pl uber -am
+./gradlew :uber:build
 
-# Skip tests
-mvn clean package -DskipTests
+# Clean build
+./gradlew clean build
 ```
 
-Each module produces a fat JAR in its `target/` directory.
+Each service module produces a fat JAR (via Shadow plugin) in its `build/libs/` directory.
 
 ## Run
 
 ```bash
 # Run the Uber MCP server
-java -jar uber/target/ardley-mcp-uber-1.0.0-SNAPSHOT.jar
+java -jar uber/build/libs/uber-1.0.0-SNAPSHOT.jar
 
 # Pipe a JSON-RPC request
 echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | \
-  java -jar uber/target/ardley-mcp-uber-1.0.0-SNAPSHOT.jar
+  java -jar uber/build/libs/uber-1.0.0-SNAPSHOT.jar
 ```
 
 ## Adding a New Module
 
 1. Create a new directory: `my-module/`
-2. Add a `pom.xml` with parent reference:
-   ```xml
-   <parent>
-       <groupId>com.ardley.mcp</groupId>
-       <artifactId>ardley-mcp-servers</artifactId>
-       <version>1.0.0-SNAPSHOT</version>
-   </parent>
+2. Add a `build.gradle.kts`:
+   ```kotlin
+   plugins {
+       id("com.github.johnrengelman.shadow")
+   }
+   dependencies {
+       implementation(project(":core"))
+   }
+   tasks.shadowJar {
+       archiveClassifier.set("")
+       manifest {
+           attributes("Main-Class" to "com.ardley.mcp.mymodule.MyMcpServer")
+       }
+   }
    ```
-3. Add `ardley-mcp-core` as a dependency
-4. Register the module in the root `pom.xml` `<modules>` section
-5. Create your tool classes implementing `McpTool`
-6. Create a main class that registers tools with `ToolRegistry` and runs `JsonRpcHandler`
+3. Add to `settings.gradle.kts`: `include("my-module")`
+4. Create your tool classes implementing `McpTool`
+5. Create a main class that registers tools with `ToolRegistry` and runs `JsonRpcHandler`
 
 ## Architecture
 

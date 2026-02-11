@@ -1,11 +1,14 @@
-# Java / Maven
-target/
+# Java
 *.class
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 *.war
 *.ear
 *.log
-dependency-reduced-pom.xml
+
+# Gradle
+build/
+.gradle/
 
 # IDE
 .idea/
@@ -16,11 +19,7 @@ dependency-reduced-pom.xml
 .settings/
 *.swp
 *~
-.factorypath
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Maven wrapper
-.mvn/wrapper/maven-wrapper.jar

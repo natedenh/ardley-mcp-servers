@@ -16,7 +16,7 @@ The existing server already implements all of the above using:
 - Java 17 + Maven
 - Google API Client Library for Java
 - OAuth2 with stored refresh tokens
-- Fat JAR via maven-shade-plugin
+- Fat JAR via Gradle Shadow plugin
 
 Migration will involve:
 1. Moving tool implementations into this module
